@@ -33,7 +33,7 @@ function createProjectCard(project) {
     // Sanitize inputs to prevent XSS
     const safeName = escapeHtml(project.name || 'Untitled Project');
     const safeDescription = escapeHtml(project.description || 'No description available.');
-    const safeLink = escapeHtml(project.link || '#');
+    const safeLink = validateUrl(project.link) || '#';
     
     return `
         <div class="project-card">
@@ -50,6 +50,24 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function validateUrl(url) {
+    if (!url || typeof url !== 'string') {
+        return null;
+    }
+    
+    try {
+        const urlObj = new URL(url);
+        // Only allow http and https protocols for security
+        if (urlObj.protocol === 'http:' || urlObj.protocol === 'https:') {
+            return url;
+        }
+        return null;
+    } catch (e) {
+        // Invalid URL format
+        return null;
+    }
 }
 
 // Function to add new projects (for future use)
